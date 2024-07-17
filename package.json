@@ -1,0 +1,27 @@
+{
+  "name": "blogapi",
+  "version": "1.0.0",
+  "description": "Blog Api using Node js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "Node",
+    "js",
+    "Express",
+    "js",
+    "Mongoose"
+  ],
+  "author": "Sayantan Sadhu",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

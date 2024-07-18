@@ -1,0 +1,62 @@
+const createCmmntCtrl = async (req, res) => {
+    try {
+        res.json({
+            status: "success",
+            data: "comment created"
+        });
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+const singleCmmntCtrl = async (req, res) => {
+    try {
+        res.json({
+            status: "success",
+            data: "comment route"
+        });
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+const allCmmntsCtrl = async (req, res) => {
+    try {
+        res.json({
+            status: "success",
+            data: "comments route"
+        });
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+const deleteCmmntCtrl = async (req, res) => {
+    try {
+        res.json({
+            status: "success",
+            data: "delete comment route"
+        });
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+const updateCmmntCtrl = async (req, res) => {
+    try {
+        res.json({
+            status: "success",
+            data: "Update comment route"
+        });
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+module.exports = {
+    createCmmntCtrl,
+    singleCmmntCtrl,
+    allCmmntsCtrl,
+    deleteCmmntCtrl,
+    updateCmmntCtrl
+}

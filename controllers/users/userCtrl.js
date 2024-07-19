@@ -2,15 +2,14 @@ const bcrypt = require('bcryptjs');
 const User = require("../../model/User/User");
 const generateToken = require('../../utils/generateToken');
 const getTokenFromHeader = require('../../utils/getTokenFromHeader');
+const { appErr, AppErr } = require('../../utils/appErr');
 
-const userRegisterCtrl = async (req, res) => {
+const userRegisterCtrl = async (req, res, next) => {
     const { firstname, lastname, profilePhoto, email, password } = req.body
     try {
         const userFound = await User.findOne({ email });
         if (userFound) {
-            return res.json({
-                msg: 'User Already Exist'
-            })
+            return next(new AppErr("User Already Exist", 500))
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -25,7 +24,7 @@ const userRegisterCtrl = async (req, res) => {
             data: user
         });
     } catch (error) {
-        res.json(error.message);
+        next(appErr(error.message));
     }
 }
 
@@ -73,11 +72,8 @@ const allUsersCtrl = async (req, res) => {
 }
 
 const profileUserCtrl = async (req, res) => {
-    const { id } = req.params;
     try {
-        const token = getTokenFromHeader(req);
-        console.log(token);
-        const user = await User.findById(id);
+        const user = await User.findById(req.userAuth);
         res.json({
             status: "success",
             data: user
@@ -109,11 +105,24 @@ const updateUserCtrl = async (req, res) => {
     }
 }
 
+const profilePhotoUploadCtrl = async (req, res) => {
+    console.log(req.file);
+    try {
+        res.json({
+            status: "success",
+            data: "Profile Photo Upload"
+        });
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
 module.exports = {
     userRegisterCtrl,
     userLoginCtrl,
     allUsersCtrl,
     profileUserCtrl,
     deleteUserCtrl,
-    updateUserCtrl
+    updateUserCtrl,
+    profilePhotoUploadCtrl
 }

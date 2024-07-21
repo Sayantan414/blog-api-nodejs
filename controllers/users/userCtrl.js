@@ -67,12 +67,12 @@ const whoViewedMyProfileCtrl = async (req, res) => {
         //Find the user who viewed the original user
         const userWhoViewed = await User.findById(req.userAuth);
         //Check if original and userWhoViewed are found
-        if(user && userWhoViewed){
+        if (user && userWhoViewed) {
             //Check if userWhoViewed is already in the users viewers array
             const isUserAlreadyViewed = user.viewers.find(
                 viewer => viewer.toString() === userWhoViewed._id.toJSON()
             );
-            if(isUserAlreadyViewed){
+            if (isUserAlreadyViewed) {
                 return next(appErr("You already viewed this profile"));
             } else {
                 //Push the userwhoViewed to the user's viewers array
@@ -83,18 +83,182 @@ const whoViewedMyProfileCtrl = async (req, res) => {
                     data: "You have successfully viewed this profile"
                 })
             }
-        } 
+        }
 
     } catch (error) {
         res.json(error.message);
     }
 }
 
-const allUsersCtrl = async (req, res) => {
+const followingCtrl = async (req, res, next) => {
     try {
+        const userToFollow = await User.findById(req.params.id);
+
+        const userWhoFollowed = await User.findById(req.userAuth);
+
+        if (userToFollow && userWhoFollowed) {
+            const isUserAlreadyFollowed = userToFollow.following.find(
+                follower => follower.toString() === userWhoFollowed._id.toString()
+            );
+
+            if (isUserAlreadyFollowed) {
+                return next(appErr("You already followed this user"));
+            } else {
+                userToFollow.followers.push(userWhoFollowed._id);
+                userWhoFollowed.following.push(userToFollow._id);
+
+                await userWhoFollowed.save();
+                await userToFollow.save();
+
+                res.json({
+                    status: "success",
+                    data: "User Followed"
+                });
+            }
+        }
+
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+const unFollowCtrl = async (req, res, next) => {
+    try {
+        const userToBeUnfollowed = await User.findById(req.params.id);
+
+        const userWhoUnfollowed = await User.findById(req.userAuth);
+
+        if (userToBeUnfollowed && userWhoUnfollowed) {
+            const isUserAlreadyFollowed = userToBeUnfollowed.followers.find(
+                follower => follower.toString() === userWhoUnfollowed._id.toString()
+            );
+
+            if (!isUserAlreadyFollowed) {
+                return next(appErr("You have not followed this user"));
+            } else {
+                userToBeUnfollowed.followers = userToBeUnfollowed.followers.filter(
+                    follower => follower.toString() !== userWhoUnfollowed._id.toString()
+                );
+
+                await userToBeUnfollowed.save();
+
+                userWhoUnfollowed.following = userWhoUnfollowed.following.filter(
+                    following => following.toString() !== userToBeUnfollowed._id.toString()
+                );
+
+                await userWhoUnfollowed.save();
+
+                res.json({
+                    status: "success",
+                    data: "User Unfollowed"
+                });
+            }
+        }
+
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+const blockCtrl = async (req, res, next) => {
+    try {
+        const userToBeBlocked = await User.findById(req.params.id);
+
+        const userWhoBlocked = await User.findById(req.userAuth);
+
+        if (userToBeBlocked && userWhoBlocked) {
+            const isUserAlreadyBlocked = userWhoBlocked.blocked.find(
+                blocked => blocked.toString() === userToBeBlocked._id.toString()
+            );
+            if (isUserAlreadyBlocked) {
+                return next(appErr("You already blocked this user"));
+            }
+
+            userWhoBlocked.blocked.push(userToBeBlocked._id);
+            await userWhoBlocked.save();
+            res.json({
+                status: "success",
+                data: "User Blocked"
+            });
+        }
+
+
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+const unblockCtrl = async (req, res, next) => {
+    try {
+        const userToBeUnBlocked = await User.findById(req.params.id);
+        const userWhoUnBlocked = await User.findById(req.userAuth);
+
+        if (userWhoUnBlocked && userToBeUnBlocked) {
+            const isUserAlreadyBlocked = userWhoUnBlocked.blocked.find(
+                blocked => blocked.toString() === userToBeUnBlocked._id.toString()
+            );
+
+            if (!isUserAlreadyBlocked) {
+                return next(appErr("You have not blocked this user"));
+            }
+
+            userWhoUnBlocked.blocked = userWhoUnBlocked.blocked.filter(
+                blocked => blocked.toString() !== userToBeUnBlocked._id.toString()
+            );
+
+            await userWhoUnBlocked.save();
+            res.json({
+                status: "success",
+                data: "User Unblocked"
+            });
+        }
+
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+const adminBlockCtrl = async (req, res, next) => {
+    try {
+        const userToBeBlocked = await User.findById(req.params.id);
+        if (!userToBeBlocked) {
+            return next(appErr("User not Found"))
+        }
+        userToBeBlocked.isBlocked = true;
+        await userToBeBlocked.save();
+
         res.json({
             status: "success",
-            data: "Users route"
+            data: "You have successfully Blocked this user"
+        });
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+const adminUnBlockCtrl = async (req, res, next) => {
+    try {
+        const userToBeUnBlocked = await User.findById(req.params.id);
+        if (!userToBeUnBlocked) {
+            return next(appErr("User not Found"))
+        }
+        userToBeUnBlocked.isBlocked = false;
+        await userToBeUnBlocked.save();
+
+        res.json({
+            status: "success",
+            data: "You have successfully Unblocked this user"
+        });
+    } catch (error) {
+        res.json(error.message);
+    }
+}
+
+const allUsersCtrl = async (req, res, next) => {
+    try {
+        const users = await User.find();
+        res.json({
+            status: "success",
+            data: users
         });
     } catch (error) {
         res.json(error.message);
@@ -141,21 +305,21 @@ const profilePhotoUploadCtrl = async (req, res) => {
         //Find the user to be updated
         const userToUpdate = await User.findById(req.userAuth);
         //Check if user is found
-        if(!userToUpdate){
+        if (!userToUpdate) {
             return next(appErr("User not found", 403));
         }
         //check if user is blocked
-        if(userToUpdate.isBlocked){
+        if (userToUpdate.isBlocked) {
             return next(appErr("Action not allowed, your account is blocked", 403));
         }
         //check if a user is updating their photo
-        if(req.file){
+        if (req.file) {
             //Update profile photo
             await User.findByIdAndUpdate(req.userAuth, {
                 $set: {
                     profilePhoto: req.file.path,
                 }
-            },{
+            }, {
                 new: true
             });
             res.json({
@@ -176,5 +340,11 @@ module.exports = {
     deleteUserCtrl,
     updateUserCtrl,
     profilePhotoUploadCtrl,
-    whoViewedMyProfileCtrl
+    whoViewedMyProfileCtrl,
+    followingCtrl,
+    unFollowCtrl,
+    blockCtrl,
+    unblockCtrl,
+    adminBlockCtrl,
+    adminUnBlockCtrl
 }

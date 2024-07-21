@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema({
-    title:{
+    title: {
         type: String,
         required: [true, "Post Title is required"],
         trim: true
@@ -13,7 +13,7 @@ const postSchema = new mongoose.Schema({
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Category",
-        required: [true, "Post category is required"],
+        // required: [true, "Post category is required"],
     },
     numViews: [
         {
@@ -42,9 +42,9 @@ const postSchema = new mongoose.Schema({
     ],
     photo: {
         type: String,
-        required: [true, "Post Image is required"]
+        // required: [true, "Post Image is required"]
     }
-},{
+}, {
     timestamps: true,
 });
 

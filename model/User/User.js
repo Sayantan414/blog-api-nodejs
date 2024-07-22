@@ -75,6 +75,7 @@ const userSchema = new mongoose.Schema({
 //Hooks
 userSchema.pre("findOne", async function (next) {
     const userId = this._conditions._id;
+    const user = await User.find({ _id: userId })
     const posts = await Post.find({ user: userId })
     const lastPost = posts[posts.length - 1];
     const lastPostDate = lastPost.createdAt;
@@ -88,15 +89,85 @@ userSchema.pre("findOne", async function (next) {
     const diff = currentDate - lastPostDate;
     const diffInDays = diff / (1000 * 3600 * 24);
 
-    if (diffInDays > 30) {
-        userSchema.virtual("isInActive").get(function () {
-            return true;
-        });
-    } else {
-        userSchema.virtual("isInActive").get(function () {
-            return false;
-        });
+    if (!user[0].isAdmin) {
+        if (diffInDays > 30) {
+            userSchema.virtual("isInActive").get(function () {
+                return true;
+            });
+            //Find the user by ID and update
+            await User.findByIdAndUpdate(userId, {
+                isBlocked: true
+            }, {
+                new: true,
+            });
+
+        } else {
+            userSchema.virtual("isInActive").get(function () {
+                return false;
+            });
+            //Find the user by ID and update
+            await User.findByIdAndUpdate(userId, {
+                isBlocked: false
+            }, {
+                new: true,
+            });
+        }
     }
+
+    //Last day active
+    const daysAgo = Math.floor(diffInDays);
+
+    userSchema.virtual("lastActive").get(function () {
+        if (daysAgo <= 0) {
+            return "Today";
+        }
+        if (daysAgo === 1) {
+            return "Yesterday";
+        }
+        if (daysAgo > 1) {
+            return `${daysAgo}`
+        }
+    });
+
+    //Update userAward based on the number of posts
+    const numberOfPosts = posts.length;
+
+    if (numberOfPosts < 10) {
+        await User.findByIdAndUpdate(
+            userId,
+            {
+                userAward: "Bronze"
+            },
+            {
+                new: true
+            }
+        )
+    }
+
+    if (numberOfPosts > 10) {
+        await User.findByIdAndUpdate(
+            userId,
+            {
+                userAward: "Silver"
+            },
+            {
+                new: true
+            }
+        )
+    }
+
+    if (numberOfPosts > 20) {
+        await User.findByIdAndUpdate(
+            userId,
+            {
+                userAward: "Gold"
+            },
+            {
+                new: true
+            }
+        )
+    }
+
     next();
 })
 

@@ -34,21 +34,17 @@ const userRegisterCtrl = async (req, res, next) => {
     }
 }
 
-const userLoginCtrl = async (req, res) => {
+const userLoginCtrl = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
         const userFound = await User.findOne({ email });
         if (!userFound) {
-            return res.json({
-                msg: 'Invalid login credentials'
-            })
+            return next(appErr("Invalid login credentials"))
         }
         const isPassMatched = await bcrypt.compare(password, userFound.password)
         if (!isPassMatched) {
-            return res.json({
-                msg: 'Invalid login credentials'
-            })
+            return next(appErr("Invalid login credentials"))
         }
 
         res.json({
@@ -62,11 +58,11 @@ const userLoginCtrl = async (req, res) => {
             }
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
-const whoViewedMyProfileCtrl = async (req, res) => {
+const whoViewedMyProfileCtrl = async (req, res, next) => {
     try {
         //Find the original
         const user = await User.findById(req.params.id);
@@ -92,7 +88,7 @@ const whoViewedMyProfileCtrl = async (req, res) => {
         }
 
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));;
     }
 }
 
@@ -162,7 +158,7 @@ const unFollowCtrl = async (req, res, next) => {
         }
 
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
@@ -190,7 +186,7 @@ const blockCtrl = async (req, res, next) => {
 
 
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
@@ -220,7 +216,7 @@ const unblockCtrl = async (req, res, next) => {
         }
 
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
@@ -238,7 +234,7 @@ const adminBlockCtrl = async (req, res, next) => {
             data: "You have successfully Blocked this user"
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
@@ -256,7 +252,7 @@ const adminUnBlockCtrl = async (req, res, next) => {
             data: "You have successfully Unblocked this user"
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
@@ -268,11 +264,11 @@ const allUsersCtrl = async (req, res, next) => {
             data: users
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
-const profileUserCtrl = async (req, res) => {
+const profileUserCtrl = async (req, res, next) => {
     try {
         const user = await User.findById(req.userAuth).populate("posts");
         res.json({
@@ -280,7 +276,7 @@ const profileUserCtrl = async (req, res) => {
             data: user
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
@@ -295,7 +291,7 @@ const deleteUserCtrl = async (req, res, next) => {
         //4. Delete all category of the user
         await Category.deleteMany({ user: req.userAuth });
         //5. delete
-        await userTodelete.delete();
+        await User.findByIdAndDelete(req.userAuth);
         //send response
         return res.json({
             status: "success",
@@ -336,7 +332,7 @@ const updateUserCtrl = async (req, res) => {
             data: user,
         });
     } catch (error) {
-        next(appErr(error.message));
+        return next(appErr(error.message));
     }
 }
 
@@ -361,7 +357,7 @@ const updatePasswordCtrl = async (req, res, next) => {
             return next(appErr("Please provide password field"));
         }
     } catch (error) {
-        next(appErr(error.message));
+        return next(appErr(error.message));
     }
 };
 
@@ -394,7 +390,7 @@ const profilePhotoUploadCtrl = async (req, res) => {
             });
         }
     } catch (error) {
-        next(appErr(error.message, 500));
+        return next(appErr(error.message));
     }
 }
 

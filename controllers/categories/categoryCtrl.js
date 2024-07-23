@@ -1,55 +1,82 @@
-const createCategoryCtrl = async (req, res) => {
+const Category = require("../../model/Category/Category");
+const { appErr } = require("../../utils/appErr");
+
+const createCategoryCtrl = async (req, res, next) => {
+    const {title} = req.body;
     try {
+        const category = await Category.create({title, user: req.userAuth})
         res.json({
             status: "success",
-            data: "category created"
+            data: category
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
-const singleCategoryCtrl = async (req, res) => {
+const fetchCategoriesCtrl = async (req, res, next) => {
     try {
+        const categories = await Category.find();
         res.json({
             status: "success",
-            data: "category route"
+            data: categories
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
-const allCategoriesCtrl = async (req, res) => {
+const singleCategoryCtrl = async (req, res, next) => {
+    try {
+        const category = await Category.findById(req.params.id)
+        res.json({
+            status: "success",
+            data: category
+        });
+    } catch (error) {
+        return next(appErr(error.message));
+    }
+}
+
+const allCategoriesCtrl = async (req, res, next) => {
     try {
         res.json({
             status: "success",
             data: "categories route"
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
-const deleteCategoryCtrl = async (req, res) => {
+const deleteCategoryCtrl = async (req, res, next) => {
     try {
+        await Category.findByIdAndUpdate(
+            req.params.id,
+          );
         res.json({
             status: "success",
-            data: "delete category route"
+            data: "Delete Successfully"
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
-const updateCategoryCtrl = async (req, res) => {
+const updateCategoryCtrl = async (req, res, next) => {
+    const {title} = req.body;
     try {
-        res.json({
+        const category = await Category.findByIdAndUpdate(
+            req.params.id,
+            { title },
+            { new: true, runValidators: true }
+          );
+          res.json({
             status: "success",
-            data: "Update category route"
-        });
+            data: category,
+          });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
@@ -58,5 +85,6 @@ module.exports = {
     singleCategoryCtrl,
     allCategoriesCtrl,
     deleteCategoryCtrl,
-    updateCategoryCtrl
+    updateCategoryCtrl,
+    fetchCategoriesCtrl
 }

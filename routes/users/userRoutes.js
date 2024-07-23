@@ -34,7 +34,7 @@ userRouter.get("/", allUsersCtrl);
 //POST/api/v1/users
 userRouter.get("/profile/", isLogin, profileUserCtrl);
 
-//DELETE/api/v1/users/:id
+//DELETE/api/v1/users/
 userRouter.delete("/delete-account", isLogin, deleteUserCtrl);
 
 //PUT/api/v1/users/:id

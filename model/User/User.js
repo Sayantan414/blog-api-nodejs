@@ -78,7 +78,6 @@ userSchema.pre("findOne", async function (next) {
     const userId = this._conditions._id;
     const user = await User.find({ _id: userId })
     const posts = await Post.find({ user: userId })
-    console.log(posts);
     const lastPost = posts[posts.length - 1];
     const lastPostDate = new Date(lastPost?.createdAt);
     const lastPostDateStr = lastPostDate.toDateString();

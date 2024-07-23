@@ -74,11 +74,13 @@ const userSchema = new mongoose.Schema({
 
 //Hooks
 userSchema.pre("findOne", async function (next) {
+    this.populate('posts');
     const userId = this._conditions._id;
     const user = await User.find({ _id: userId })
     const posts = await Post.find({ user: userId })
+    console.log(posts);
     const lastPost = posts[posts.length - 1];
-    const lastPostDate = lastPost.createdAt;
+    const lastPostDate = new Date(lastPost?.createdAt);
     const lastPostDateStr = lastPostDate.toDateString();
 
     userSchema.virtual("lastPostDate").get(function () {
@@ -89,7 +91,7 @@ userSchema.pre("findOne", async function (next) {
     const diff = currentDate - lastPostDate;
     const diffInDays = diff / (1000 * 3600 * 24);
 
-    if (!user[0].isAdmin) {
+    if (!user[0]?.isAdmin) {
         if (diffInDays > 30) {
             userSchema.virtual("isInActive").get(function () {
                 return true;

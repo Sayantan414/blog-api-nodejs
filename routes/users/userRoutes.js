@@ -11,7 +11,8 @@ const { userRegisterCtrl, userLoginCtrl,
     blockCtrl,
     unblockCtrl,
     adminBlockCtrl,
-    adminUnBlockCtrl } = require('../../controllers/users/userCtrl');
+    adminUnBlockCtrl,
+    updatePasswordCtrl } = require('../../controllers/users/userCtrl');
 const isLogin = require('../../middlewares/isLogin');
 const multer = require('multer');
 const storage = require('../../config/cloudinary');
@@ -34,10 +35,13 @@ userRouter.get("/", allUsersCtrl);
 userRouter.get("/profile/", isLogin, profileUserCtrl);
 
 //DELETE/api/v1/users/:id
-userRouter.delete("/:id", deleteUserCtrl);
+userRouter.delete("/delete-account", isLogin, deleteUserCtrl);
 
 //PUT/api/v1/users/:id
-userRouter.put("/:id", updateUserCtrl);
+userRouter.put("/", isLogin, updateUserCtrl);
+
+//PUT/api/v1/users/:id
+userRouter.put("/update-password", isLogin, updatePasswordCtrl);
 
 //POST/api/v1/users/:id
 userRouter.post("/profile-photo-upload", isLogin, upload.single("profile"), profilePhotoUploadCtrl);

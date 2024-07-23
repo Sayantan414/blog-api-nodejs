@@ -3,28 +3,34 @@ const User = require("../../model/User/User");
 const generateToken = require('../../utils/generateToken');
 const getTokenFromHeader = require('../../utils/getTokenFromHeader');
 const { appErr, AppErr } = require('../../utils/appErr');
+const Post = require('../../model/Post/Post');
+const Comment = require('../../model/Comment/Comments');
+const Category = require('../../model/Category/Category');
 
 const userRegisterCtrl = async (req, res, next) => {
-    const { firstname, lastname, profilePhoto, email, password } = req.body
+    const { firstname, lastname, email, password } = req.body;
     try {
+        //Check if email exist
         const userFound = await User.findOne({ email });
         if (userFound) {
-            return next(new AppErr("User Already Exist", 500))
+            return next(new AppErr("User Already Exist", 500));
         }
-
+        //hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-
         //create the user
         const user = await User.create({
-            firstname, lastname, profilePhoto, email, password: hashedPassword
-        })
+            firstname,
+            lastname,
+            email,
+            password: hashedPassword,
+        });
         res.json({
             status: "success",
-            data: user
+            data: user,
         });
     } catch (error) {
-        next(appErr(error.message));
+        return next(appErr(error.message));
     }
 }
 
@@ -159,6 +165,7 @@ const unFollowCtrl = async (req, res, next) => {
         res.json(error.message);
     }
 }
+
 const blockCtrl = async (req, res, next) => {
     try {
         const userToBeBlocked = await User.findById(req.params.id);
@@ -267,7 +274,7 @@ const allUsersCtrl = async (req, res, next) => {
 
 const profileUserCtrl = async (req, res) => {
     try {
-        const user = await User.findById(req.userAuth);
+        const user = await User.findById(req.userAuth).populate("posts");
         res.json({
             status: "success",
             data: user
@@ -277,27 +284,86 @@ const profileUserCtrl = async (req, res) => {
     }
 }
 
-const deleteUserCtrl = async (req, res) => {
+const deleteUserCtrl = async (req, res, next) => {
     try {
-        res.json({
+        //1. Find the user to be deleted
+        const userTodelete = await User.findById(req.userAuth);
+        //2. find all posts to be deleted
+        await Post.deleteMany({ user: req.userAuth });
+        //3. Delete all comments of the user
+        await Comment.deleteMany({ user: req.userAuth });
+        //4. Delete all category of the user
+        await Category.deleteMany({ user: req.userAuth });
+        //5. delete
+        await userTodelete.delete();
+        //send response
+        return res.json({
             status: "success",
-            data: "Delete user route"
+            data: "Your account has been deleted successfully",
         });
     } catch (error) {
-        res.json(error.message);
+        return next(appErr(error.message));
     }
 }
 
 const updateUserCtrl = async (req, res) => {
+    const { email, lastname, firstname } = req.body;
     try {
+        //Check if email is not taken
+        if (email) {
+            const emailTaken = await User.findOne({ email });
+            if (emailTaken) {
+                return next(appErr("Email is taken", 400));
+            }
+        }
+
+        //update the user
+        const user = await User.findByIdAndUpdate(
+            req.userAuth,
+            {
+                lastname,
+                firstname,
+                email,
+            },
+            {
+                new: true,
+                runValidators: true,
+            }
+        );
+        //send response
         res.json({
             status: "success",
-            data: "Update user route"
+            data: user,
         });
     } catch (error) {
-        res.json(error.message);
+        next(appErr(error.message));
     }
 }
+
+const updatePasswordCtrl = async (req, res, next) => {
+    const { password } = req.body;
+    try {
+        //Check if user is updating the password
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            //update user
+            await User.findByIdAndUpdate(
+                req.userAuth,
+                { password: hashedPassword },
+                { new: true, runValidators: true }
+            );
+            res.json({
+                status: "success",
+                data: "Password has been changed successfully",
+            });
+        } else {
+            return next(appErr("Please provide password field"));
+        }
+    } catch (error) {
+        next(appErr(error.message));
+    }
+};
 
 const profilePhotoUploadCtrl = async (req, res) => {
     console.log(req.file);
@@ -346,5 +412,6 @@ module.exports = {
     blockCtrl,
     unblockCtrl,
     adminBlockCtrl,
-    adminUnBlockCtrl
+    adminUnBlockCtrl,
+    updatePasswordCtrl
 }

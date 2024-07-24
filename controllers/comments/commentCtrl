@@ -1,62 +1,82 @@
-const createCmmntCtrl = async (req, res) => {
-    try {
-        res.json({
-            status: "success",
-            data: "comment created"
-        });
-    } catch (error) {
-        res.json(error.message);
-    }
+const Post = require("../../model/Post/Post");
+const User = require("../../model/User/User");
+const Comment = require("../../model/Comment/Comments");
+const { appErr } = require("../../utils/appErr");
+
+const createCmmntCtrl = async (req, res, next) => {
+    const { description } = req.body;
+  try {
+    //Find the post
+    const post = await Post.findById(req.params.id);
+    //create comment
+    const comment = await Comment.create({
+      post: post._id,
+      description,
+      user: req.userAuth,
+    });
+    //push the comment to post
+    post.comments.push(comment._id);
+    //Find the user
+    const user = await User.findById(req.userAuth);
+    //Push to user
+    user.comments.push(comment._id);
+    //save
+    //Disable validation
+    await post.save({ validateBeforeSave: false });
+    await user.save({ validateBeforeSave: false });
+
+    res.json({
+      status: "success",
+      data: comment,
+    });
+  } catch (error) {
+    next(appErr(error.message));
+  }
 }
 
-const singleCmmntCtrl = async (req, res) => {
+
+const deleteCmmntCtrl = async (req, res, next) => {
     try {
+        //find the Comment
+        const comment = await Comment.findById(req.params.id);
+        if (comment.user.toString() !== req.userAuth.toString()) {
+          return next(appErr("You are not allowed to update this comment", 403));
+        }
+        await Comment.findByIdAndDelete(req.params.id);
         res.json({
-            status: "success",
-            data: "comment route"
+          status: "success",
+          data: "Comment has been deleted successfully",
         });
-    } catch (error) {
-        res.json(error.message);
-    }
+      } catch (error) {
+        next(appErr(error.message));
+      }
 }
 
-const allCmmntsCtrl = async (req, res) => {
-    try {
-        res.json({
-            status: "success",
-            data: "comments route"
-        });
-    } catch (error) {
-        res.json(error.message);
+const updateCmmntCtrl = async (req, res, next) => {
+    const { description } = req.body;
+  try {
+    //find the Comment
+    const comment = await Comment.findById(req.params.id);
+    if (comment.user.toString() !== req.userAuth.toString()) {
+      return next(appErr("You are not allowed to update this comment", 403));
     }
-}
 
-const deleteCmmntCtrl = async (req, res) => {
-    try {
-        res.json({
-            status: "success",
-            data: "delete comment route"
-        });
-    } catch (error) {
-        res.json(error.message);
-    }
-}
-
-const updateCmmntCtrl = async (req, res) => {
-    try {
-        res.json({
-            status: "success",
-            data: "Update comment route"
-        });
-    } catch (error) {
-        res.json(error.message);
-    }
+    const category = await Comment.findByIdAndUpdate(
+      req.params.id,
+      { description },
+      { new: true, runValidators: true }
+    );
+    res.json({
+      status: "success",
+      data: category,
+    });
+  } catch (error) {
+    next(appErr(error.message));
+  }
 }
 
 module.exports = {
     createCmmntCtrl,
-    singleCmmntCtrl,
-    allCmmntsCtrl,
     deleteCmmntCtrl,
     updateCmmntCtrl
 }

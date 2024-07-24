@@ -1,25 +1,20 @@
 const express = require('express');
 const { createCmmntCtrl,
-    singleCmmntCtrl,
-    allCmmntsCtrl,
     deleteCmmntCtrl,
     updateCmmntCtrl } = require('../../controllers/comments/commentCtrl');
+
+const isLogin = require("../../middlewares/isLogin");
+
 const commentRouter = express.Router();
 
 //POST/api/v1/comments
-commentRouter.post("/", createCmmntCtrl);
-
-//POST/api/v1/comments/:id
-commentRouter.get("/:id", singleCmmntCtrl);
-
-//POST/api/v1/comments
-commentRouter.get("/", allCmmntsCtrl);
+commentRouter.post("/:id", isLogin, createCmmntCtrl);
 
 //DELETE/api/v1/comments/:id
-commentRouter.delete("/:id", deleteCmmntCtrl);
+commentRouter.delete("/:id", isLogin, deleteCmmntCtrl);
 
 //PUT/api/v1/comments/:id
-commentRouter.put("/:id", updateCmmntCtrl);
+commentRouter.put("/:id", isLogin, updateCmmntCtrl);
 
 
 module.exports = commentRouter;

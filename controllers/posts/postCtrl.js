@@ -3,7 +3,7 @@ const User = require("../../model/User/User");
 const { appErr } = require("../../utils/appErr");
 
 const createPostCtrl = async (req, res, next) => {
-    const { title, description } = req.body;
+    const { title, description, category } = req.body;
   try {
     //Find the user
     const author = await User.findById(req.userAuth);
@@ -16,6 +16,8 @@ const createPostCtrl = async (req, res, next) => {
       title,
       description,
       user: author._id,
+      category,
+      photo: req?.file?.path
     });
     //Associate user to a post -Push the post into the user posts field
     author.posts.push(postCreated);
@@ -68,25 +70,53 @@ const fetchPostsCtrl = async (req, res, next) => {
 }
 
 const deletePostCtrl = async (req, res, next) => {
-    try {
-        res.json({
-            status: "success",
-            data: "delete post route"
-        });
-    } catch (error) {
-        res.json(error.message);
+  try {
+    //check if the post belongs to the user
+
+    //find the post
+    const post = await Post.findById(req.params.id);
+    if (post.user.toString() !== req.userAuth.toString()) {
+      return next(appErr("You are not allowed to delete this post", 403));
     }
+    await Post.findByIdAndDelete(req.params.id);
+    res.json({
+      status: "success",
+      data: "Post deleted successfully",
+    });
+  } catch (error) {
+    next(appErr(error.message));
+  }
 }
 
 const updatePostCtrl = async (req, res, next) => {
-    try {
-        res.json({
-            status: "success",
-            data: "Update post route"
-        });
-    } catch (error) {
-        res.json(error.message);
+  const { title, description, category } = req.body;
+  try {
+    //find the post
+    const post = await Post.findById(req.params.id);
+    //check if the post belongs to the user
+
+    if (post.user.toString() !== req.userAuth.toString()) {
+      return next(appErr("You are not allowed to delete this post", 403));
     }
+    await Post.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        description,
+        category,
+        photo: req?.file?.path,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json({
+      status: "success",
+      data: post,
+    });
+  } catch (error) {
+    next(appErr(error.message));
+  }
 }
 
 const toggleDisLikesPostCtrl = async (req, res, next) => {

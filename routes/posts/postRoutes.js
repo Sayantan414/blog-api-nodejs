@@ -24,7 +24,7 @@ postRouter.post("/", isLogin, upload.single('image'), createPostCtrl);
 postRouter.get("/:id", singlePostCtrl);
 
 //POST/api/v1/posts
-postRouter.get("/", isLogin, fetchPostsCtrl);
+postRouter.get("/", fetchPostsCtrl);
 
 //DELETE/api/v1/posts/:id
 postRouter.delete("/:id", isLogin, deletePostCtrl);

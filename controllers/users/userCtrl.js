@@ -30,7 +30,7 @@ const userRegisterCtrl = async (req, res, next) => {
             data: user,
         });
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -58,7 +58,7 @@ const userLoginCtrl = async (req, res, next) => {
             }
         });
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -88,7 +88,7 @@ const whoViewedMyProfileCtrl = async (req, res, next) => {
         }
 
     } catch (error) {
-        return next(appErr(error.message));;
+        next(appErr(error.message));;
     }
 }
 
@@ -158,7 +158,7 @@ const unFollowCtrl = async (req, res, next) => {
         }
 
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -186,7 +186,7 @@ const blockCtrl = async (req, res, next) => {
 
 
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -216,7 +216,7 @@ const unblockCtrl = async (req, res, next) => {
         }
 
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -234,7 +234,7 @@ const adminBlockCtrl = async (req, res, next) => {
             data: "You have successfully Blocked this user"
         });
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -252,7 +252,7 @@ const adminUnBlockCtrl = async (req, res, next) => {
             data: "You have successfully Unblocked this user"
         });
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -264,7 +264,7 @@ const allUsersCtrl = async (req, res, next) => {
             data: users
         });
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -276,7 +276,7 @@ const profileUserCtrl = async (req, res, next) => {
             data: user
         });
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -298,7 +298,7 @@ const deleteUserCtrl = async (req, res, next) => {
             data: "Your account has been deleted successfully",
         });
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -332,7 +332,7 @@ const updateUserCtrl = async (req, res) => {
             data: user,
         });
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 
@@ -357,7 +357,7 @@ const updatePasswordCtrl = async (req, res, next) => {
             return next(appErr("Please provide password field"));
         }
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 };
 
@@ -390,7 +390,7 @@ const profilePhotoUploadCtrl = async (req, res) => {
             });
         }
     } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
     }
 }
 

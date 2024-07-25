@@ -178,11 +178,6 @@ userSchema.pre("findOne", async function (next) {
     next();
 })
 
-userSchema.post("save", function (next) {
-    console.log("Post hook called");
-    next();
-})
-
 userSchema.virtual("fullname").get(function () {
     return `${this.firstname} ${this.lastname}`;
 })

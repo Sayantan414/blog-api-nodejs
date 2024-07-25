@@ -386,7 +386,7 @@ const profilePhotoUploadCtrl = async (req, res) => {
             });
             res.json({
                 status: "success",
-                data: "Profile Photo Uploaded"
+                data: req.file.path
             });
         }
     } catch (error) {

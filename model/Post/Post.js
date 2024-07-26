@@ -74,6 +74,11 @@ postSchema.pre(/^find/, function (next) {
     const post = this;
     return post.disLikes?.length;
   });
+
+  postSchema.virtual("commentsCount").get(function () {
+    const post = this;
+    return post.comments?.length;
+  });
   //check the most liked post in percentage
   postSchema.virtual("likesPercentage").get(function () {
     const post = this;

@@ -34,12 +34,17 @@ const createPostCtrl = async (req, res, next) => {
 
 const singlePostCtrl = async (req, res, next) => {
     try {
+      const post = await Post.findById(req.params.id).populate("user")
+      .populate("category", "title");
+      if(!post){
+        return next(appErr("Post not found", 404));
+      }
         res.json({
             status: "success",
-            data: "post route"
+            data: post
         });
     } catch (error) {
-        res.json(error.message);
+      next(appErr(error.message));
     }
 }
 
@@ -65,7 +70,7 @@ const fetchPostsCtrl = async (req, res, next) => {
           data: filteredPosts,
         });
       } catch (error) {
-        return next(appErr(error.message));
+        next(appErr(error.message));
       }
 }
 

@@ -55,6 +55,7 @@ const userLoginCtrl = async (req, res, next) => {
                 email: userFound.email,
                 isAdmin: userFound.isAdmin,
                 profilePhoto: userFound.profilePhoto,
+                id: userFound.id,
                 token: generateToken(userFound._id),
             }
         });

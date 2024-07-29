@@ -12,7 +12,8 @@ const { userRegisterCtrl, userLoginCtrl,
     unblockCtrl,
     adminBlockCtrl,
     adminUnBlockCtrl,
-    updatePasswordCtrl } = require('../../controllers/users/userCtrl');
+    updatePasswordCtrl,
+    otherProfileUserCtrl } = require('../../controllers/users/userCtrl');
 const isLogin = require('../../middlewares/isLogin');
 const multer = require('multer');
 const storage = require('../../config/cloudinary');
@@ -66,6 +67,9 @@ userRouter.put("/adminBlock/:id", isLogin, isAdmin, adminBlockCtrl);
 
 //PUT/api/v1/users/adminUnBlock/:id
 userRouter.put("/adminUnBlock/:id", isLogin, isAdmin, adminUnBlockCtrl);
+
+//GET/api/v1/users/otherUser/:id
+userRouter.get("/otherUser/:id", isLogin, otherProfileUserCtrl);
 
 
 module.exports = userRouter;

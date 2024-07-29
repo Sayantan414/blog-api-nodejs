@@ -53,10 +53,10 @@ const userSchema = new mongoose.Schema({
     ],
     comments: [
         {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Comment",
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Comment",
         },
-      ],
+    ],
     blocked: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -194,7 +194,7 @@ userSchema.virtual("followersCount").get(function () {
     return this.followers.length;
 })
 
-userSchema.virtual("followeringCount").get(function () {
+userSchema.virtual("followingCount").get(function () {
     return this.following.length;
 })
 

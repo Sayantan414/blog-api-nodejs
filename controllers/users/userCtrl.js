@@ -281,6 +281,18 @@ const profileUserCtrl = async (req, res, next) => {
     }
 }
 
+const otherProfileUserCtrl = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id).populate("posts");
+        res.json({
+            status: "success",
+            data: user
+        });
+    } catch (error) {
+        next(appErr(error.message));
+    }
+}
+
 const deleteUserCtrl = async (req, res, next) => {
     try {
         //1. Find the user to be deleted
@@ -410,5 +422,6 @@ module.exports = {
     unblockCtrl,
     adminBlockCtrl,
     adminUnBlockCtrl,
-    updatePasswordCtrl
+    updatePasswordCtrl,
+    otherProfileUserCtrl
 }

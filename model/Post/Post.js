@@ -28,7 +28,7 @@ const postSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    disLikes: [
+    dislikes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -71,9 +71,9 @@ postSchema.pre(/^find/, function (next) {
   });
 
   //add dislikes count as virtual field
-  postSchema.virtual("disLikesCount").get(function () {
+  postSchema.virtual("dislikesCount").get(function () {
     const post = this;
-    return post.disLikes?.length;
+    return post.dislikes?.length;
   });
 
   postSchema.virtual("commentsCount").get(function () {
@@ -83,16 +83,16 @@ postSchema.pre(/^find/, function (next) {
   //check the most liked post in percentage
   postSchema.virtual("likesPercentage").get(function () {
     const post = this;
-    const total = +post.likes?.length + +post.disLikes?.length;
+    const total = +post.likes?.length + +post.dislikes?.length;
     const percentage = (post.likes?.length / total) * 100;
     return `${percentage}%`;
   });
 
   //check the most disliked post in percentage
-  postSchema.virtual("disLikesPercentage").get(function () {
+  postSchema.virtual("dislikesPercentage").get(function () {
     const post = this;
-    const total = +post.disLikes?.length + +post.disLikes?.length;
-    const percentage = (post.disLikes?.length / total) * 100;
+    const total = +post.dislikes?.length + +post.dislikes?.length;
+    const percentage = (post.dislikes?.length / total) * 100;
     return `${percentage}%`;
   });
 

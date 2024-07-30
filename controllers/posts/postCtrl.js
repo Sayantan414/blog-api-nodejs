@@ -129,16 +129,16 @@ const toggleDisLikesPostCtrl = async (req, res, next) => {
       //1. Get the post
       const post = await Post.findById(req.params.id);
       //2. Check if the user has already unliked the post
-      const isUnliked = post.disLikes.includes(req.userAuth);
+      const isUnliked = post.dislikes.includes(req.userAuth);
       //3. If the user has already liked the post, unlike the post
       if (isUnliked) {
-        post.disLikes = post.disLikes.filter(
+        post.dislikes = post.dislikes.filter(
           dislike => dislike.toString() !== req.userAuth.toString()
         );
         await post.save();
       } else {
         //4. If the user has not liked the post, like the post
-        post.disLikes.push(req.userAuth);
+        post.dislikes.push(req.userAuth);
         await post.save();
       }
       res.json({

@@ -197,6 +197,7 @@ const toggleDisLikesPostCtrl = async (req, res, next) => {
       const post = await Post.findById(req.params.id);
       //Number of view
       //check if user viewed this post
+      
       const isViewed = post.numViews.includes(req.userAuth);
       if (isViewed) {
         res.json({
@@ -205,7 +206,6 @@ const toggleDisLikesPostCtrl = async (req, res, next) => {
         });
       } else {
         //pust the user into numOfViews
-  
         post.numViews.push(req.userAuth);
         //save
         await post.save();

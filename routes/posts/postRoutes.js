@@ -38,7 +38,7 @@ postRouter.get("/likes/:id", isLogin, toggleLikesPostCtrl);
 //GET/api/v1/posts/dislikes:id
 postRouter.get("/dislikes/:id", isLogin, toggleDisLikesPostCtrl);
 
-//GET/api/v1/posts/:id
-postRouter.get("/:id", isLogin, postDetailsCtrl);
+//GET/api/v1/posts/numViews/:id
+postRouter.get("/numViews/:id", isLogin, postDetailsCtrl);
 
 module.exports = postRouter;

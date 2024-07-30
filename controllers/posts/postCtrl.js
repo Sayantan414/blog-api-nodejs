@@ -130,14 +130,21 @@ const toggleDisLikesPostCtrl = async (req, res, next) => {
       const post = await Post.findById(req.params.id);
       //2. Check if the user has already unliked the post
       const isUnliked = post.dislikes.includes(req.userAuth);
+      const isliked = post.likes.includes(req.userAuth);
       //3. If the user has already liked the post, unlike the post
       if (isUnliked) {
         post.dislikes = post.dislikes.filter(
           dislike => dislike.toString() !== req.userAuth.toString()
         );
         await post.save();
-      } else {
+      } else if(isliked && !isUnliked) {
         //4. If the user has not liked the post, like the post
+        post.likes = post.likes.filter(
+          like => like.toString() !== req.userAuth.toString()
+        );
+        post.dislikes.push(req.userAuth);
+        await post.save();
+      }else{
         post.dislikes.push(req.userAuth);
         await post.save();
       }
@@ -157,11 +164,18 @@ const toggleDisLikesPostCtrl = async (req, res, next) => {
       const post = await Post.findById(req.params.id);
       //2. Check if the user has already liked the post
       const isLiked = post.likes.includes(req.userAuth);
+      const isUnliked = post.dislikes.includes(req.userAuth);
       //3. If the user has already liked the post, unlike the post
       if (isLiked) {
         post.likes = post.likes.filter(
           like => like.toString() !== req.userAuth.toString()
         );
+        await post.save();
+      } else if(isUnliked && !isLiked){
+        post.dislikes = post.dislikes.filter(
+          dislike => dislike.toString() !== req.userAuth.toString()
+        );
+        post.likes.push(req.userAuth);
         await post.save();
       } else {
         //4. If the user has not liked the post, like the post

@@ -101,6 +101,9 @@ const followingCtrl = async (req, res, next) => {
         const userWhoFollowed = await User.findById(req.userAuth);
 
         if (userToFollow && userWhoFollowed) {
+            if(userToFollow === userWhoFollowed){
+                return next(appErr("You cannot follow yourself"));
+            }
             const isUserAlreadyFollowed = userToFollow.following.find(
                 follower => follower.toString() === userWhoFollowed._id.toString()
             );

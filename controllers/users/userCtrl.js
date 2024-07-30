@@ -119,7 +119,7 @@ const followingCtrl = async (req, res, next) => {
 
                 res.json({
                     status: "success",
-                    data: "User Followed"
+                    data: userToFollow
                 });
             }
         }
@@ -157,7 +157,7 @@ const unFollowCtrl = async (req, res, next) => {
 
                 res.json({
                     status: "success",
-                    data: "User Unfollowed"
+                    data: userToBeUnfollowed
                 });
             }
         }

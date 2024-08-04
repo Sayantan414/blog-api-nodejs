@@ -17,9 +17,6 @@ categoryRouter.get("/:id", singleCategoryCtrl);
 //GET/api/v1/categories/:id
 categoryRouter.get("/", fetchCategoriesCtrl);
 
-//POST/api/v1/categories
-categoryRouter.get("/", allCategoriesCtrl);
-
 //DELETE/api/v1/categories/:id
 categoryRouter.delete("/:id", isLogin, deleteCategoryCtrl);
 

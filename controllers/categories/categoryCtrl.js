@@ -1,89 +1,80 @@
 const Category = require("../../model/Category/Category");
 const { appErr } = require("../../utils/appErr");
 
+//create
 const createCategoryCtrl = async (req, res, next) => {
-    const {title} = req.body;
+    const { title } = req.body;
     try {
-        const category = await Category.create({title, user: req.userAuth})
+        const category = await Category.create({ title, user: req.userAuth });
         res.json({
             status: "success",
-            data: category
+            data: category,
         });
     } catch (error) {
         return next(appErr(error.message));
     }
-}
+};
 
-const fetchCategoriesCtrl = async (req, res, next) => {
+//all
+const fetchCategoriesCtrl = async (req, res) => {
     try {
         const categories = await Category.find();
         res.json({
             status: "success",
-            data: categories
+            data: categories,
         });
     } catch (error) {
-        return next(appErr(error.message));
+        res.json(error.message);
     }
-}
+};
 
-const singleCategoryCtrl = async (req, res, next) => {
+//single
+const singleCategoryCtrl = async (req, res) => {
     try {
-        const category = await Category.findById(req.params.id)
+        const category = await Category.findById(req.params.id);
         res.json({
             status: "success",
-            data: category
+            data: category,
         });
     } catch (error) {
-        return next(appErr(error.message));
+        res.json(error.message);
     }
-}
+};
 
-const allCategoriesCtrl = async (req, res, next) => {
+//Delete
+const deleteCategoryCtrl = async (req, res) => {
     try {
+        await Category.findByIdAndDelete(req.params.id);
         res.json({
             status: "success",
-            data: "categories route"
+            data: "Deleted successfully",
         });
     } catch (error) {
-        return next(appErr(error.message));
+        res.json(error.message);
     }
-}
+};
 
-const deleteCategoryCtrl = async (req, res, next) => {
-    try {
-        await Category.findByIdAndUpdate(
-            req.params.id,
-          );
-        res.json({
-            status: "success",
-            data: "Delete Successfully"
-        });
-    } catch (error) {
-        return next(appErr(error.message));
-    }
-}
-
-const updateCategoryCtrl = async (req, res, next) => {
-    const {title} = req.body;
+//update
+const updateCategoryCtrl = async (req, res) => {
+    const { title } = req.body;
     try {
         const category = await Category.findByIdAndUpdate(
             req.params.id,
             { title },
             { new: true, runValidators: true }
-          );
-          res.json({
+        );
+        res.json({
             status: "success",
             data: category,
-          });
+        });
     } catch (error) {
-        return next(appErr(error.message));
+        res.json(error.message);
     }
-}
+};
 
 module.exports = {
     createCategoryCtrl,
     singleCategoryCtrl,
-    allCategoriesCtrl,
     deleteCategoryCtrl,
     updateCategoryCtrl,
     fetchCategoriesCtrl

@@ -8,7 +8,8 @@ const commentSchema = new mongoose.Schema(
       required: [true, "Post is required"],
     },
     user: {
-      type: Object,
+      type: mongoose.Schema.Types.ObjectId, // This should be an ObjectId reference
+      ref: "User", // Ensure this references the User model
       required: [true, "User is required"],
     },
     description: {

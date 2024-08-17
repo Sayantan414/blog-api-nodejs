@@ -75,8 +75,28 @@ const updateCmmntCtrl = async (req, res, next) => {
   }
 }
 
+const getCmmntByIdCtrl = async (req, res, next) => {
+  try {
+    // Find the comment by ID
+    const comment = await Comment.findById(req.params.id);
+
+    // If the comment doesn't exist
+    if (!comment) {
+      return next(appErr("Comment not found", 404));
+    }
+
+    res.json({
+      status: "success",
+      data: comment,
+    });
+  } catch (error) {
+    next(appErr(error.message));
+  }
+};
+
 module.exports = {
     createCmmntCtrl,
     deleteCmmntCtrl,
-    updateCmmntCtrl
+    updateCmmntCtrl,
+    getCmmntByIdCtrl
 }

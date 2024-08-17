@@ -219,6 +219,36 @@ const toggleDisLikesPostCtrl = async (req, res, next) => {
     }
   };
 
+  const getCommentsByPostIdCtrl = async (req, res, next) => {
+    try {
+      // Find the post by ID and populate comments with user details
+      const post = await Post.findById(req.params.id)
+        .populate({
+          path: "comments",
+          populate: {
+            path: "user",
+            model: "User", // Reference to the User model
+          }
+        });
+  
+      // If no post is found, return an error
+      if (!post) {
+        return next(appErr("Post not found", 404));
+      }
+  
+      // Ensure comments is an array, or set it to an empty array
+      const comments = post.comments || [];
+  
+      res.json({
+        status: "success",
+        data: comments,
+      });
+    } catch (error) {
+      next(appErr(error.message));
+    }
+  };
+
+
 module.exports = {
     createPostCtrl,
     singlePostCtrl,
@@ -227,5 +257,6 @@ module.exports = {
     updatePostCtrl,
     toggleDisLikesPostCtrl,
     toggleLikesPostCtrl,
-    postDetailsCtrl
+    postDetailsCtrl,
+    getCommentsByPostIdCtrl
 }

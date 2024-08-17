@@ -1,7 +1,7 @@
 const express = require('express');
 const { createCmmntCtrl,
     deleteCmmntCtrl,
-    updateCmmntCtrl } = require('../../controllers/comments/commentCtrl');
+    updateCmmntCtrl, getCmmntByIdCtrl } = require('../../controllers/comments/commentCtrl');
 
 const isLogin = require("../../middlewares/isLogin");
 
@@ -15,6 +15,10 @@ commentRouter.delete("/:id", isLogin, deleteCmmntCtrl);
 
 //PUT/api/v1/comments/:id
 commentRouter.put("/:id", isLogin, updateCmmntCtrl);
+
+//PUT/api/v1/comments/:id
+commentRouter.get("/:id", isLogin, getCmmntByIdCtrl);
+
 
 
 module.exports = commentRouter;

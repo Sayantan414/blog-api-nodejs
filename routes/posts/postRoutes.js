@@ -7,7 +7,8 @@ const {
     updatePostCtrl,
     toggleDisLikesPostCtrl,
     toggleLikesPostCtrl,
-    postDetailsCtrl
+    postDetailsCtrl,
+    getCommentsByPostIdCtrl
 } = require('../../controllers/posts/postCtrl');
 const isLogin = require('../../middlewares/isLogin');
 const multer = require('multer');
@@ -40,5 +41,8 @@ postRouter.get("/dislikes/:id", isLogin, toggleDisLikesPostCtrl);
 
 //GET/api/v1/posts/numViews/:id
 postRouter.get("/numViews/:id", isLogin, postDetailsCtrl);
+
+//GET/api/v1/posts/comments/:id
+postRouter.get("/comments/:id", isLogin, getCommentsByPostIdCtrl);
 
 module.exports = postRouter;

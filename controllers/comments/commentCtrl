@@ -4,35 +4,51 @@ const Comment = require("../../model/Comment/Comments");
 const { appErr } = require("../../utils/appErr");
 
 const createCmmntCtrl = async (req, res, next) => {
-    const { description } = req.body;
+  const { description } = req.body;
   try {
-    //Find the post
+    // Find the post
     const post = await Post.findById(req.params.id);
-    //create comment
+    if (!post) {
+      return next(appErr('Post not found'));
+    }
+
+    // Create the comment
     const comment = await Comment.create({
       post: post._id,
       description,
       user: req.userAuth,
     });
-    //push the comment to post
+
+    // Push the comment to the post
     post.comments.push(comment._id);
-    //Find the user
-    const user = await User.findById(req.userAuth);
-    //Push to user
-    user.comments.push(comment._id);
-    //save
-    //Disable validation
     await post.save({ validateBeforeSave: false });
-    await user.save({ validateBeforeSave: false });
+
+    // Find the user and push the comment to user (optional)
+    const user = await User.findById(req.userAuth);
+    if (user) {
+      user.comments.push(comment._id);
+      await user.save({ validateBeforeSave: false });
+    }
+
+    // Populate the user field in the comment
+    const populatedComment = await Comment.findById(comment._id).populate('user').exec();
+
+    // Check if the user is populated
+    if (!populatedComment.user) {
+      console.log('User not populated');
+    } else {
+      console.log('User populated successfully');
+    }
 
     res.json({
       status: "success",
-      data: comment,
+      data: populatedComment,
     });
   } catch (error) {
+    console.error('Error:', error);
     next(appErr(error.message));
   }
-}
+};
 
 
 const deleteCmmntCtrl = async (req, res, next) => {
@@ -53,27 +69,30 @@ const deleteCmmntCtrl = async (req, res, next) => {
 }
 
 const updateCmmntCtrl = async (req, res, next) => {
-    const { description } = req.body;
+  const { description } = req.body;
   try {
-    //find the Comment
+    // Find the Comment
     const comment = await Comment.findById(req.params.id);
     if (comment.user.toString() !== req.userAuth.toString()) {
       return next(appErr("You are not allowed to update this comment", 403));
     }
 
-    const category = await Comment.findByIdAndUpdate(
+    // Update the Comment
+    const updatedComment = await Comment.findByIdAndUpdate(
       req.params.id,
       { description },
       { new: true, runValidators: true }
-    );
+    ).populate('user').exec(); // Populating the user field
+
     res.json({
       status: "success",
-      data: category,
+      data: updatedComment,
     });
   } catch (error) {
     next(appErr(error.message));
   }
 }
+
 
 const getCmmntByIdCtrl = async (req, res, next) => {
   try {

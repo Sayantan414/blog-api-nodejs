@@ -50,12 +50,7 @@ const userLoginCtrl = async (req, res, next) => {
         res.json({
             status: "success",
             data: {
-                firstname: userFound.firstname,
-                lastname: userFound.lastname,
-                email: userFound.email,
-                isAdmin: userFound.isAdmin,
-                profilePhoto: userFound.profilePhoto,
-                id: userFound.id,
+                details: userFound,
                 token: generateToken(userFound._id),
             }
         });

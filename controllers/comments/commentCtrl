@@ -52,21 +52,33 @@ const createCmmntCtrl = async (req, res, next) => {
 
 
 const deleteCmmntCtrl = async (req, res, next) => {
-    try {
-        //find the Comment
-        const comment = await Comment.findById(req.params.id);
-        if (comment.user.toString() !== req.userAuth.toString()) {
-          return next(appErr("You are not allowed to update this comment", 403));
-        }
-        await Comment.findByIdAndDelete(req.params.id);
-        res.json({
+  try {
+      // Find the comment
+      const comment = await Comment.findById(req.params.id);
+      
+      // Check if the comment belongs to the authenticated user
+      if (comment.user.toString() !== req.userAuth.toString()) {
+          return next(appErr("You are not allowed to delete this comment", 403));
+      }
+      
+      // Remove the comment ID from the user's comments array
+      await User.findByIdAndUpdate(comment.user, {
+          $pull: { comments: req.params.id }
+      });
+
+      // Delete the comment
+      await Comment.findByIdAndDelete(req.params.id);
+
+      // Send a success response
+      res.json({
           status: "success",
           data: "Comment has been deleted successfully",
-        });
-      } catch (error) {
-        next(appErr(error.message));
-      }
-}
+      });
+  } catch (error) {
+      next(appErr(error.message));
+  }
+};
+
 
 const updateCmmntCtrl = async (req, res, next) => {
   const { description } = req.body;

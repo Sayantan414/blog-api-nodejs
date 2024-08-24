@@ -97,7 +97,7 @@ userSchema.pre("findOne", async function (next) {
     const diffInDays = diff / (1000 * 3600 * 24);
 
     if (!user[0]?.isAdmin) {
-        if (diffInDays > 30) {
+        if (diffInDays > 90) {
             userSchema.virtual("isInActive").get(function () {
                 return true;
             });

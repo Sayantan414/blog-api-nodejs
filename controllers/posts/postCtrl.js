@@ -99,6 +99,7 @@ const updatePostCtrl = async (req, res, next) => {
     //find the post
     const post = await Post.findById(req.params.id);
     //check if the post belongs to the user
+// console.log("object");
 
     if (post.user.toString() !== req.userAuth.toString()) {
       return next(appErr("You are not allowed to delete this post", 403));
@@ -109,7 +110,7 @@ const updatePostCtrl = async (req, res, next) => {
         title,
         description,
         category,
-        photo: req?.file?.path,
+        // photo: req?.file?.path,
       },
       {
         new: true,

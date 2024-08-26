@@ -12,7 +12,7 @@ const { userRegisterCtrl, userLoginCtrl,
     unblockCtrl,
     adminBlockCtrl,
     adminUnBlockCtrl,
-    updatePasswordCtrl,
+    // updatePasswordCtrl,
     otherProfileUserCtrl } = require('../../controllers/users/userCtrl');
 const isLogin = require('../../middlewares/isLogin');
 const multer = require('multer');
@@ -42,7 +42,7 @@ userRouter.delete("/delete-account", isLogin, deleteUserCtrl);
 userRouter.put("/", isLogin, updateUserCtrl);
 
 //PUT/api/v1/users/:id
-userRouter.put("/update-password", isLogin, updatePasswordCtrl);
+// userRouter.put("/update-password", isLogin, updatePasswordCtrl);
 
 //POST/api/v1/users/:id
 userRouter.post("/profile-photo-upload", isLogin, upload.single("profile"), profilePhotoUploadCtrl);

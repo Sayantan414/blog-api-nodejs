@@ -314,31 +314,42 @@ const deleteUserCtrl = async (req, res, next) => {
     }
 }
 
-const updateUserCtrl = async (req, res) => {
-    const { email, lastname, firstname } = req.body;
+const updateUserCtrl = async (req, res, next) => {
+    const { email, lastname, firstname, password } = req.body;
     try {
-        //Check if email is not taken
+        // Check if the email is not taken
         if (email) {
             const emailTaken = await User.findOne({ email });
-            if (emailTaken) {
+            if (emailTaken && emailTaken._id.toString() !== req.userAuth.toString()) {
                 return next(appErr("Email is taken", 400));
             }
         }
 
-        //update the user
+        // Initialize the update object
+        const updateData = {
+            lastname,
+            firstname,
+            email,
+        };
+
+        // Check if the user is updating the password
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            updateData.password = hashedPassword;
+        }
+
+        // Update the user
         const user = await User.findByIdAndUpdate(
             req.userAuth,
-            {
-                lastname,
-                firstname,
-                email,
-            },
+            updateData,
             {
                 new: true,
                 runValidators: true,
             }
         );
-        //send response
+
+        // Send response
         res.json({
             status: "success",
             data: user,
@@ -346,32 +357,8 @@ const updateUserCtrl = async (req, res) => {
     } catch (error) {
         next(appErr(error.message));
     }
-}
-
-const updatePasswordCtrl = async (req, res, next) => {
-    const { password } = req.body;
-    try {
-        //Check if user is updating the password
-        if (password) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(password, salt);
-            //update user
-            await User.findByIdAndUpdate(
-                req.userAuth,
-                { password: hashedPassword },
-                { new: true, runValidators: true }
-            );
-            res.json({
-                status: "success",
-                data: "Password has been changed successfully",
-            });
-        } else {
-            return next(appErr("Please provide password field"));
-        }
-    } catch (error) {
-        next(appErr(error.message));
-    }
 };
+
 
 const profilePhotoUploadCtrl = async (req, res) => {
     console.log(req.file);
@@ -421,6 +408,5 @@ module.exports = {
     unblockCtrl,
     adminBlockCtrl,
     adminUnBlockCtrl,
-    updatePasswordCtrl,
     otherProfileUserCtrl
 }
